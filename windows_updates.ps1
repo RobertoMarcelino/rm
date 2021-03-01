@@ -51,6 +51,9 @@ $Senderarg6 = '-o'
 $Senderarg7 = '0'
 $Senderarg8 = '1'
 
+$token="Hostname"
+$extractedValue = Get-Content $Senderarg3
+$hostname = (($extractedValue -split [System.Environment]::NewLine) | where {$_ -Like "$token*"}).Substring("$token=".Length);
 
 If(!(test-path $reportpath))
 {
@@ -99,12 +102,12 @@ if ($updates.Count -eq 0) {
 	Write-Output "- Winupdates.Hidden $($countHidden)" | Out-File -Encoding "ASCII" -FilePath $env:temp$SenderargcountHidden
     Write-Host "`t There are no pending updates" -ForeGroundColor "Green"
 	
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargUpdateReboot -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderarglastupdated -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderargcountcritical -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountOptional -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountHidden -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg5 $Senderargupdating $Senderarg6 $Senderarg7 -s "$env:computername"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargUpdateReboot -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderarglastupdated -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderargcountcritical -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountOptional -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountHidden -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg5 $Senderargupdating $Senderarg6 $Senderarg7 -s "$hostname"
 	
 	exit $returnStateOK
 }
@@ -139,12 +142,12 @@ if (($countCritical + $countOptional) -gt 0) {
     Write-Host "`t There are $($countOptional) optional updates available" -ForeGroundColor "Yellow"
     Write-Host "`t There are $($countHidden) hidden updates available" -ForeGroundColor "Yellow"
 	
-    & $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargUpdateReboot -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderarglastupdated -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderargcountcritical -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountOptional -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountHidden -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg5 $Senderargupdating $Senderarg6 $Senderarg7 -s "$env:computername"
+    & $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargUpdateReboot -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderarglastupdated -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderargcountcritical -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountOptional -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountHidden -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg5 $Senderargupdating $Senderarg6 $Senderarg7 -s "$hostname"
 }   
 
 # ------------------------------------------------------------------------- #
@@ -169,11 +172,11 @@ if ($countCritical -gt 0 -Or $countOptional -gt 2) {
 			Write-Host "`t Initialising and checking for applicable updates. Please wait ..." -ForeGroundColor "Yellow"
 			$Result = $Searcher.Search("IsInstalled=0 and Type='Software' and IsHidden=0")
 
-				$ReportFile = $reportpath + "\" + $Env:ComputerName + " - Windows Update Report - "  + $TodayFile + ".txt"
+				$ReportFile = $reportpath + "\" + $hostname + " - Windows Update Report - "  + $TodayFile + ".txt"
 				If (Test-Path $ReportFile) {
 					Remove-Item $ReportFile
 				}
-				New-Item $ReportFile -Type File -Force -Value "Windows Update Report for computer: $Env:ComputerName`r`n" | Out-Null
+				New-Item $ReportFile -Type File -Force -Value "Windows Update Report for computer: $hostname`r`n" | Out-Null
 				Add-Content $ReportFile "Report created on: $Today`r"
 				
 			If ($Result.Updates.Count -EQ 0) {
@@ -185,7 +188,7 @@ if ($countCritical -gt 0 -Or $countOptional -gt 2) {
 			Else {
 
 				Add-Content $ReportFile "==============================================================================`r`n"
-				Write-Host "`t Preparing List of applicable updates for this computer ..." -ForeGroundColor "Yellow"
+				Write-Host "`t Preparing list of applicable updates for this computer ..." -ForeGroundColor "Yellow"
 				Add-Content $ReportFile "List of applicable updates for this computer`r"
 				Add-Content $ReportFile "------------------------------------------------`r"
 				For ($Counter = 0; $Counter -LT $Result.Updates.Count; $Counter++) {
@@ -213,14 +216,14 @@ if ($countCritical -gt 0 -Or $countOptional -gt 2) {
 						Add-Content $ReportFile "`t Download status: SUCCESS"
 					}
 					Else {
-						Add-Content $ReportFile "`t Download status: FAILED With Error -- $Error()"
+						Add-Content $ReportFile "`t Download status: FAILED With Error -- $Error"
 						$Error.Clear()
 						Add-content $ReportFile "`r"
 					}	
 				}
 				$Counter = 0
 				$DisplayCount = 0
-				Write-Host "`t Starting Installation of downloaded updates ..." -ForegroundColor "Yellow"
+				Write-Host "`t Starting installation of downloaded updates ..." -ForegroundColor "Yellow"
 				Add-Content $ReportFile "`r`n"
 				Add-Content $ReportFile "Installation of downloaded updates"
 				Add-Content $ReportFile "------------------------------------------------`r"
@@ -237,7 +240,7 @@ if ($countCritical -gt 0 -Or $countOptional -gt 2) {
 					}
 					Catch {
 						[System.Exception]
-						Add-Content $ReportFile "`t Update installation status: FAILED With Error -- $Error()"
+						Add-Content $ReportFile "`t Update installation status: FAILED With Error -- $Error"
 						$Error.Clear()
 						Add-content $ReportFile "`r"
 					}	
@@ -265,11 +268,11 @@ if ($countCritical -gt 0 -Or $countOptional -gt 2) {
     Write-Host "`t There are now $($countOptional) optional updates available" -ForeGroundColor "Yellow"
     Write-Host "`t There are now $($countHidden) hidden updates available" -ForeGroundColor "Yellow"
 
-    & $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargUpdateReboot -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderarglastupdated -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderargcountcritical -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountOptional -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountHidden -s "$env:computername"
+    & $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargUpdateReboot -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderarglastupdated -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderargcountcritical -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountOptional -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountHidden -s "$hostname"
 
 	exit $returnStateCritical
 }
@@ -295,12 +298,12 @@ if ($countHidden -gt 0) {
     Write-Host "`t There are $($countOptional) optional updates available" -ForeGroundColor "Yellow"
     Write-Host "`t There are $($countHidden) hidden updates available" -ForeGroundColor "Yellow"
 	
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargUpdateReboot -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderarglastupdated -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderargcountcritical -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountOptional -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountHidden -s "$env:computername"
-	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg5 $Senderargupdating $Senderarg6 $Senderarg7 -s "$env:computername"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargUpdateReboot -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderarglastupdated -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$Senderargcountcritical -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountOptional -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg4 $env:temp$SenderargcountHidden -s "$hostname"
+	& $Sender $Senderarg1 $Senderarg2 $Senderarg3 $Senderarg5 $Senderargupdating $Senderarg6 $Senderarg7 -s "$hostname"
 	
 	exit $returnStateOK
 }

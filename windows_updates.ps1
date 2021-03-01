@@ -51,9 +51,17 @@ $Senderarg6 = '-o'
 $Senderarg7 = '0'
 $Senderarg8 = '1'
 
-$token="Hostname"
-$extractedValue = Get-Content $Senderarg3
-$hostname = (($extractedValue -split [System.Environment]::NewLine) | where {$_ -Like "$token*"}).Substring("$token=".Length);
+$file = Get-Content $Senderarg3
+$file | foreach {
+  $items = $_.split("=")
+  if ($items[0] -eq "Hostname"){$result = $items[1]}
+}
+
+if (-not($result)){
+    $hostname = $env:computername
+} else {
+    $hostname = $result.Trim()
+}
 
 If(!(test-path $reportpath))
 {
